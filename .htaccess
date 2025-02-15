@@ -1,13 +1,35 @@
-
-
 RewriteEngine On
+
+# Force HTTPS for all incoming requests
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Custom error pages
 ErrorDocument 404 /index.html
 
-
+# Prevent directory listings
 Options -Indexes
+
+# Add essential security headers
+<IfModule mod_headers.c>
+    # Enable Strict-Transport-Security (HSTS) to enforce HTTPS
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # X-Frame-Options to prevent clickjacking
+    Header always set X-Frame-Options "DENY"
+
+    # X-Content-Type-Options to prevent MIME-type sniffing
+    Header set X-Content-Type-Options "nosniff"
+
+    # Referrer-Policy to limit information leakage
+    Header set Referrer-Policy "no-referrer-when-downgrade"
+
+    # Permissions-Policy to limit browser feature use
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+    # Content-Security-Policy (CSP) - updated to allow external Font Awesome styles and fonts
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self'; font-src 'self' https://cdnjs.cloudflare.com data:;"
+</IfModule>
 
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php80” package as the default “PHP” programming language.
